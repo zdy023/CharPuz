@@ -1,7 +1,7 @@
 //Generator.java
 package xyz.davidchangx.puzzle;
 import java.util.HashMap;
-//import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.ArrayDeque;
 //import xyz.davidchangx.puzzle.Dict;
 import java.util.TreeMap;
@@ -98,7 +98,7 @@ public class Generator
 	private boolean succeededOrNot;
 	private int hMin,hMax,vMin,vMax;
 	private char[][] map;
-	int width,height;
+	private int width,height;
 
 	public Generator(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
@@ -108,19 +108,23 @@ public class Generator
 		this.hMin = this.vMin = 0;
 		this.hMax = this.vMax = -1;
 		this.width = this.height = 0;
-		this.map = new char[0][];
+		this.map = null;
 	}
 
 	public void setSize(int width,int height)
 	{
 		this.width = width;
 		this.height = height;
-		System.out.println("node 3: " + this.width + " " + this.height);
+		//System.out.println("node 3: " + this.width + " " + this.height);
 		this.map = new char[width<<1][height<<1];
 		for(int i = 0;i<map.length;i++)
 		{
 			Arrays.fill(map[i],'\0');
 		}
+	}
+	public void setDictionary(TreeMap<Character,TreeMap<String,Integer>> dictionary)
+	{
+		this.dictionary = dictionary;
 	}
 	private boolean generate(int hMax,int hMin,int vMax,int vMin,int deepLimit)
 	{
@@ -145,20 +149,20 @@ public class Generator
 			Object[] firstOptions = char_Strings[r.nextInt(char_Strings.length)].keySet().toArray();
 			String firstOne = (String)firstOptions[r.nextInt(firstOptions.length)];
 			addedStrings.push(new StringStatus(firstOne,firstOne.length()-1,0,0,0,true));
-			System.out.println("node 4: " + firstOne + " " + (firstOne.length()-1) + " " + 0 + " " + 0 + " " + 0);
+			//System.out.println("node 4: " + firstOne + " " + (firstOne.length()-1) + " " + 0 + " " + 0 + " " + 0);
 			if(firstOne.length()>=width)
 			{
 				addedStrings.pop();
 				return false;
 			}
-			System.out.println("node 7");
+			//System.out.println("node 7");
 			for(int i = 0,n = firstOne.length();i<n;i++)
 				map[width+i][height] = firstOne.charAt(i);
 			if(generate(firstOne.length()-1,0,0,0,deepLimit+1))
 				return true;
 			else
 			{
-				System.out.println("node 8");
+				//System.out.println("node 8");
 				for(int i = 0,n = firstOne.length();i<n;i++)
 					map[width+i][height] = '\0';
 				//Roll-back
@@ -324,24 +328,29 @@ public class Generator
 	{
 		if(this.succeededOrNot)
 		{
-			addedStrings.stream().forEach((StringStatus x)->System.out.println(x.string + " " + x.hMax + " " + x.hMin + " " + x.vMax + " " + x.vMin));
+			/*addedStrings.stream().forEach((StringStatus x)->System.out.println(x.string + " " + x.hMax + " " + x.hMin + " " + x.vMax + " " + x.vMin));
 			for(int i = 0;i<(height<<1);i++)
 			{
 				for(int j = 0;j<(width<<1);j++)
 					System.out.printf("%1$2c ",map[j][i]=='\0'?'〇':map[j][i]);
 				System.out.println();
-			}
+			}*/
 			char[][] realMap = new char[this.width][this.height];
 			for(int i = 0;i<width;i++)
 			{
-				for(int j = 0;j<height;j++)
+				/*for(int j = 0;j<height;j++)
 				{
 					realMap[i][j] = map[width+hMin+i][height+vMin+j];
-				}
+				}*/
+				System.arraycopy(map[width+hMin+i],height+vMin,realMap[i],0,height);
 			}
 			return realMap;
 		}
 		else
 			return null;
+	}
+	public ArrayList<StringStatus> getIdiomList()
+	{
+		return new ArrayList<StringStatus>(addedStrings);
 	}
 }
