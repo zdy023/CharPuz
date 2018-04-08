@@ -2,3 +2,6 @@
 tags
 opt/*
 *.txt
+*.dict
+*.jar
+image/*

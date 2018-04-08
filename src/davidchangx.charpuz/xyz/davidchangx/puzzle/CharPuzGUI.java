@@ -40,9 +40,13 @@ import javax.swing.SpinnerNumberModel;
 import java.awt.FlowLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.awt.Color;
+import javax.swing.JMenuItem;
+import java.awt.Font;
+import java.io.UnsupportedEncodingException;
 public class CharPuzGUI extends JFrame
 {
-	private JMenu newGameMenu,setDictMenu;
+	private JMenuItem newGameMenuItem,setDictMenuItem;
 
 	private PuzzlePainterPanel gameArea;
 
@@ -50,35 +54,45 @@ public class CharPuzGUI extends JFrame
 	private JLabel dictNameLabel;
 	private JButton showAnswerButton;
 
-	private final static int X = 60; //the lenth of a character grid
-	private final static int S = 60; //the font size
+	private final static int X = 40; //the lenth of a character grid
+	private final static int S = 20; //the font size of the text on the face panel
+	private final static int MF = 18; //the font size of the text on menu bar
+	private final static int FS = 30; //the font size of the text in puzzle
 	private final static int L = 300; //the width of sidebar
 	private final static int H = 60; //the reserved space for the top of the window
 
 	private Generator gn;
 	private int puzzleX,puzzleY,blankPercentage;
 
+	private boolean generateNewGameOrNot;
 	private FileFilter dictFileFilter,txtDictFileFilter;
 
 	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
 		super("填字游戏");
-		this.setSize((X<<5)+L,(X<<5)+H);
 
 		this.gn = new Generator(dictionary);
-		puzzleX = puzzleY = 0;
+		puzzleX = puzzleY = 18;
 		blankPercentage = 0;
+		this.setSize(X*puzzleX+L,X*puzzleY+H);
 
+
+		generateNewGameOrNot = false;
 		dictFileFilter = new FileNameExtensionFilter("二进制词典文件","dict");
 		txtDictFileFilter = new FileNameExtensionFilter("词典文本文件","txt");
 
 		JMenuBar menuBar = new JMenuBar();
-		newGameMenu = new JMenu("新游戏");
-		newGameMenu.addActionListener(this::configNewGame);
-		setDictMenu = new JMenu("设置词库");
-		setDictMenu.addActionListener(this::setDictionary); 
-		menuBar.add(newGameMenu);
-		menuBar.add(setDictMenu);
+		JMenu gameMenu = new JMenu("游戏");
+		gameMenu.setFont(new Font(null,Font.PLAIN,MF));
+		newGameMenuItem = new JMenuItem("新游戏");
+		newGameMenuItem.setFont(new Font(null,Font.PLAIN,MF));
+		newGameMenuItem.addActionListener(this::configNewGame);
+		setDictMenuItem = new JMenuItem("设置词库");
+		setDictMenuItem.setFont(new Font(null,Font.PLAIN,MF));
+		setDictMenuItem.addActionListener(this::setDictionary); 
+		gameMenu.add(newGameMenuItem);
+		gameMenu.add(setDictMenuItem);
+		menuBar.add(gameMenu);
 		this.setJMenuBar(menuBar);
 
 		this.setLayout(new BorderLayout());
@@ -88,8 +102,10 @@ public class CharPuzGUI extends JFrame
 		this.add(gameArea,BorderLayout.CENTER);
 
 		rightSidebarBox = new Box(BoxLayout.Y_AXIS);
-		dictNameLabel = new JLabel("当前词库：某?全唐诗??");
+		dictNameLabel = new JLabel("当前词库：Dict(Default)");
+		dictNameLabel.setFont(new Font(null,Font.PLAIN,S));
 		showAnswerButton = new JButton("显示答案");
+		showAnswerButton.setFont(new Font(null,Font.PLAIN,S));
 		showAnswerButton.addActionListener(this::showAnswer);
 		showAnswerButton.setEnabled(false);
 		rightSidebarBox.add(dictNameLabel);
@@ -97,7 +113,7 @@ public class CharPuzGUI extends JFrame
 		this.add(rightSidebarBox,BorderLayout.EAST);
 
 		this.addWindowListener(new WindowAdapter() {
-			public void windowClosint(WindowEvent e)
+			public void windowClosing(WindowEvent e)
 			{
 				System.exit(0);
 			}
@@ -110,27 +126,31 @@ public class CharPuzGUI extends JFrame
 		this.gn.setDictionary(dictionary);
 	}
 
-	private void configNewGame(ActionEvent e)
+	private void configNewGame(ActionEvent e) //handle the event to start a new game
 	{
 		NewGameDialog newGameDialog = new NewGameDialog();
 		newGameDialog.setVisible(true);
 
-		gn.setSize(puzzleX,puzzleY);
-		for(int i = 0;i<10;i++)
+		if(generateNewGameOrNot)
 		{
-			if(gn.generate())
+			gn.setSize(puzzleX,puzzleY);
+			for(int i = 0;i<10;i++)
 			{
-				gameArea.realPuzzle = gn.getMap();
-				gameArea.status = PuzzlePainterStatus.DRAW_PUZZLE;
-				gameArea.draw();
-				showAnswerButton.setEnabled(true);
-				this.validate();
-				return;
+				if(gn.generate())
+				{
+					this.setSize(X*puzzleX+L,X*puzzleY+H);
+					gameArea.realPuzzle = gn.getMap();
+					gameArea.status = PuzzlePainterStatus.DRAW_PUZZLE;
+					gameArea.draw();
+					showAnswerButton.setEnabled(true);
+					this.validate();
+					return;
+				}
 			}
+			JOptionPane.showMessageDialog(this,"生成失败……您可更换词库或调整区域大小后再次尝试。","生成失败",JOptionPane.INFORMATION_MESSAGE);
 		}
-		JOptionPane.showMessageDialog(this,"生成失败……您可更换词库或调整区域大小后再次尝试。","生成失败",JOptionPane.INFORMATION_MESSAGE);
 	}
-	private void setDictionary(ActionEvent e)
+	private void setDictionary(ActionEvent e) //handle the event to change the dictionary
 	{
 		JFileChooser dictFileChooser = new JFileChooser(".");
 		dictFileChooser.addChoosableFileFilter(dictFileFilter);
@@ -151,7 +171,8 @@ public class CharPuzGUI extends JFrame
 				else
 					dictionary = readDictionary(dictFile);
 				gn.setDictionary(dictionary);
-				dictNameLabel.setText("当前词库：" + dictFileName.substring(0,dictFileName.length()-4));
+				dictNameLabel.setText("当前词库：" + dictFileName.substring(0,dictFileName.lastIndexOf((int)'.')));
+				JOptionPane.showMessageDialog(this,"词库更新完成！","提示",JOptionPane.INFORMATION_MESSAGE);
 			}
 			catch(FileNotFoundException fnfe)
 			{
@@ -165,14 +186,13 @@ public class CharPuzGUI extends JFrame
 			}
 		}
 	}
-	private void showAnswer(ActionEvent e)
+	private void showAnswer(ActionEvent e) //handle the event to show the answer of the puzzle
 	{
 		gameArea.status = PuzzlePainterStatus.DRAW_ANSWER;
 		gameArea.draw();
-		this.validate();
 	}
 
-	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file,String charset) throws FileNotFoundException
+	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file,String charset) throws FileNotFoundException //a tool method to parse a text dict file to a runtime dict
 	{
 		TreeMap<Character,TreeMap<String,Integer>> dictionary = new TreeMap<>();
 		Scanner s = new Scanner(file,charset);
@@ -189,10 +209,22 @@ public class CharPuzGUI extends JFrame
 		}
 		return dictionary;
 	}
-	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file) throws FileNotFoundException
+	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file) throws FileNotFoundException,UnsupportedEncodingException //a tool method to parse a text dict file to a runtime dict
 	{
 		TreeMap<Character,TreeMap<String,Integer>> dictionary = new TreeMap<>();
-		Scanner s = new Scanner(file);
+		String[] charsets = {"utf-8","gbk","utf-16"};
+		Scanner s = null;
+		{
+			int i;
+			for(i = 0;i<3;i++)
+			{
+				s = new Scanner(file,charsets[i]);
+				if(s.hasNext())
+					break;
+			}
+			if(i==3)
+				throw new UnsupportedEncodingException("The scanner can scan the dict file as neither utf-8, gbk or utf-16,  please ensure that your dict file is encoded in one of them. ");
+		}
 		for(;s.hasNext();)
 		{
 			String str = s.next();
@@ -206,7 +238,7 @@ public class CharPuzGUI extends JFrame
 		}
 		return dictionary;
 	}
-	public static TreeMap<Character,TreeMap<String,Integer>> readDictionary(File file) throws FileNotFoundException,IOException //read dictionary from a binary file
+	public static TreeMap<Character,TreeMap<String,Integer>> readDictionary(File file) throws FileNotFoundException,IOException //a tool method to read a dict in from a binary dict file
 	{
 		try
 		{
@@ -221,7 +253,7 @@ public class CharPuzGUI extends JFrame
 			return null;
 		}
 	}
-	public static void writeDictionary(File file,TreeMap<Character,TreeMap<String,Integer>> dictionary) throws FileNotFoundException,IOException //save dictionary into a binary file
+	public static void writeDictionary(File file,TreeMap<Character,TreeMap<String,Integer>> dictionary) throws FileNotFoundException,IOException //a tool method to save a dict into a binary dict file by serialization
 	{
 		ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
 		oos.writeObject(dictionary);
@@ -229,11 +261,12 @@ public class CharPuzGUI extends JFrame
 		oos.close();
 	}
 
-	private class PuzzlePainterPanel extends JPanel
+	private class PuzzlePainterPanel extends JPanel //the panel to render the game
 	{
-		PuzzlePainterStatus status;
+		PuzzlePainterStatus status; //mark to determine the paint behavior of the panel
 		private Random r;
 		char[][] realPuzzle; //the full puzzle with answer
+		private JTextField[][] userPuzzleTextFields; //the puzzle for user to play
 
 		PuzzlePainterPanel()
 		{
@@ -244,52 +277,51 @@ public class CharPuzGUI extends JFrame
 
 		void draw()
 		{
-			this.removeAll();
 			switch(status)
 			{
 				case CLEAR_AREA:
+					this.removeAll();
 					return;
 				case DRAW_PUZZLE:
+					this.removeAll();
 					this.setLayout(new GridLayout(realPuzzle[0].length,realPuzzle.length));
+					userPuzzleTextFields = new JTextField[puzzleX][puzzleY];
 					for(int j = 0;j<realPuzzle[0].length;j++)
 					{
 						for(int i = 0;i<realPuzzle.length;i++)
 						{
-							JTextField charTextField = new JTextField(2);
+							userPuzzleTextFields[i][j] = new JTextField(2);
 							if(realPuzzle[i][j]=='\0')
-								charTextField.setEnabled(false);
+							{
+								userPuzzleTextFields[i][j].setEnabled(false);
+								userPuzzleTextFields[i][j].setBackground(Color.GRAY);
+							}
 							else
 							{
 								if(r.nextInt(100)>=blankPercentage)
 								{
-									charTextField.setText(String.valueOf(realPuzzle[i][j]));
-									charTextField.setEditable(false);
+									userPuzzleTextFields[i][j].setText(String.valueOf(realPuzzle[i][j]));
+									userPuzzleTextFields[i][j].setEditable(false);
+									userPuzzleTextFields[i][j].setBackground(new Color(0x4d7a97));
 								}
 							}
-							charTextField.setSize(X,X);
-							this.add(charTextField);
+							userPuzzleTextFields[i][j].setSize(X,X);
+							userPuzzleTextFields[i][j].setFont(new Font(null,Font.PLAIN,FS));
+							this.add(userPuzzleTextFields[i][j]);
 						}
 					}
 					break;
 				case DRAW_ANSWER:
-					this.setLayout(new GridLayout(realPuzzle[0].length,realPuzzle.length));
 					for(int j = 0;j<realPuzzle[0].length;j++)
 					{
 						for(int i = 0;i<realPuzzle.length;i++)
 						{
-							JTextField charTextField = new JTextField(2);
-							if(realPuzzle[i][j]=='\0')
-								charTextField.setEnabled(false);
-							else
+							if(realPuzzle[i][j]!='\0'&&!userPuzzleTextFields[i][j].getText().equals(String.valueOf(realPuzzle[i][j])))
 							{
-								if(r.nextInt(100)>=blankPercentage)
-								{
-									charTextField.setText(String.valueOf(realPuzzle[i][j]));
-									charTextField.setEditable(false);
-								}
+								userPuzzleTextFields[i][j].setText(String.valueOf(realPuzzle[i][j]));
+								userPuzzleTextFields[i][j].setBackground(Color.RED);
 							}
-							charTextField.setSize(X,X);
-							this.add(charTextField);
+							userPuzzleTextFields[i][j].setEditable(false);
 						}
 					}
 					break;
@@ -297,15 +329,16 @@ public class CharPuzGUI extends JFrame
 		}
 	}
 
-	private class NewGameDialog extends JDialog
+	private class NewGameDialog extends JDialog //dialog of the configuration of new game
 	{
-		private final static int L1 = 200; //the length of the input field
-		private final static int HI = 60; //the height of the input field
-		private final static int LL = 100; //the length of the labels
+		private final static int L1 = 150; //the length of the input field
+		private final static int HI = 30; //the height of the input field
+		private final static int LL = 30; //the length of the labels
+		private final static int LF = 18; //the font size of the labels
 		private final static int L2 = 100; //the length of the button
-		private final static int W = 400; //the width of dialog
-		private final static int H = 300; //the height of dialog
-		private final static int HF = 240; //the height of SplitPane
+		private final static int W = 180; //the width of dialog
+		private final static int H = 130; //the height of dialog
+		private final static int HF = 100; //the height of SplitPane
 
 		private JSplitPane ratingEditorSplitPane;
 
@@ -323,29 +356,33 @@ public class CharPuzGUI extends JFrame
 		{
 			super(CharPuzGUI.this,"新游戏",true);
 			this.setSize(W,H);
+			this.setLocation((CharPuzGUI.this.getWidth()>>1)-(W>>1),(CharPuzGUI.this.getHeight()>>1)-(H>>1));
 			this.setLayout(new BorderLayout());
 
 			ratingEditorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true);
 			ratingEditorSplitPane.setSize(W,HF);
-			ratingEditorSplitPane.setDividerLocation(.4);
+			ratingEditorSplitPane.setDividerLocation(.3);
 
 			inputLabelBox = new Box(BoxLayout.Y_AXIS);
 			xSizeLabel = new JLabel("宽度");
 			xSizeLabel.setSize(LL,HI);
+			xSizeLabel.setFont(new Font(null,Font.PLAIN,LF));
 			ySizeLabel = new JLabel("高度");
 			ySizeLabel.setSize(LL,HI);
+			ySizeLabel.setFont(new Font(null,Font.PLAIN,LF));
 			difficultyLabel = new JLabel("难易");
 			difficultyLabel.setSize(LL,HI);
+			difficultyLabel.setFont(new Font(null,Font.PLAIN,LF));
 			inputLabelBox.add(xSizeLabel);
 			inputLabelBox.add(ySizeLabel);
 			inputLabelBox.add(difficultyLabel);
 
 			inputFieldBox = new Box(BoxLayout.Y_AXIS);
-			xSizeSetterSpinner = new JSpinner(new SpinnerNumberModel(15,10,30,1));
+			xSizeSetterSpinner = new JSpinner(new SpinnerNumberModel(puzzleX,10,30,1));
 			xSizeSetterSpinner.setSize(L1,HI);
-			ySizeSetterSpinner = new JSpinner(new SpinnerNumberModel(15,10,30,1));
+			ySizeSetterSpinner = new JSpinner(new SpinnerNumberModel(puzzleY,10,30,1));
 			ySizeSetterSpinner.setSize(L1,HI);
-			difficultySetterSlider = new JSlider(0,100,0);
+			difficultySetterSlider = new JSlider(0,100,blankPercentage);
 			difficultySetterSlider.setSize(L1,HI);
 			inputFieldBox.add(xSizeSetterSpinner);
 			inputFieldBox.add(ySizeSetterSpinner);
@@ -358,7 +395,10 @@ public class CharPuzGUI extends JFrame
 			dialogButtonsArea = new JPanel();
 			dialogButtonsArea.setLayout(new FlowLayout(FlowLayout.CENTER));
 			cancelButton = new JButton("取消");
-			cancelButton.addActionListener((ActionEvent e)->NewGameDialog.this.dispose());
+			cancelButton.addActionListener((ActionEvent e)->{
+				NewGameDialog.this.dispose();
+				generateNewGameOrNot = false;
+			});
 			confirmButton = new JButton("确认");
 			confirmButton.addActionListener(this::setNewGameConfig);
 			dialogButtonsArea.add(cancelButton);
@@ -371,11 +411,12 @@ public class CharPuzGUI extends JFrame
 			puzzleX = ((Number)(xSizeSetterSpinner.getValue())).intValue();
 			puzzleY = ((Number)(ySizeSetterSpinner.getValue())).intValue();
 			blankPercentage = difficultySetterSlider.getValue();
+			generateNewGameOrNot = true;
 			this.dispose();
 		}
 	}
 }
-enum PuzzlePainterStatus
+enum PuzzlePainterStatus //status of PuzzlePainterPanel to mark to determine the paint behavior of the panel
 {
 	DRAW_PUZZLE,DRAW_ANSWER,CLEAR_AREA;
 }
