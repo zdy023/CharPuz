@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.OptionalInt;
 public class Generator
 {
-	public class StringStatus //for the status of the string like coordinats, horizontal or vertical and etc.
+	public class StringStatus implements Cloneable//for the status of the string like coordinats, horizontal or vertical and etc.
 	{
 		String string; //字符串
 		int hMax,hMin; //水平坐标范围
@@ -75,6 +75,13 @@ public class Generator
 		public int hashCode()
 		{
 			return this.string.hashCode();
+		}
+		
+		public Object clone()
+		{
+			StringStatus stringStatus = new StringStatus(this.string,this.hMax,this.hMin,this.vMax,this.vMin,this.horiOrNot);
+			this.connectedIndex.ifPresentOrElse(x->{stringStatus.connectedIndex = OptionalInt.of(x);},()->{stringStatus.connectedIndex = OptionalInt.empty();});
+			return stringStatus;
 		}
 	}
 
@@ -308,8 +315,15 @@ public class Generator
 		else
 			return null;
 	}
-	public ArrayList<StringStatus> getIdiomList()
+	public StringStatus[] getIdiomList()
 	{
-		return new ArrayList<StringStatus>(addedStrings);
+		return addedStrings.stream().map((StringStatus x)->{
+			StringStatus y = (StringStatus)x.clone();
+			y.hMax -= hMin;
+			y.hMin -= hMin;
+			y.vMax -= vMin;
+			y.vMin -= vMin;
+			return y;
+		}).toArray(StringStatus[]::new);
 	}
 }

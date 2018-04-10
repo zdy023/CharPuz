@@ -65,7 +65,7 @@ public class CharPuzGUI extends JFrame
 	private int puzzleX,puzzleY,blankPercentage;
 
 	private boolean generateNewGameOrNot;
-	private FileFilter dictFileFilter,txtDictFileFilter;
+	private FileFilter dictFileFilter,txtDictFileFilter,combinedDictFileFilter;
 
 	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
@@ -80,6 +80,7 @@ public class CharPuzGUI extends JFrame
 		generateNewGameOrNot = false;
 		dictFileFilter = new FileNameExtensionFilter("二进制词典文件","dict");
 		txtDictFileFilter = new FileNameExtensionFilter("词典文本文件","txt");
+		combinedDictFileFilter = new FileNameExtensionFilter("词典文件 *.dict;*.txt","dict","txt");
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu gameMenu = new JMenu("游戏");
@@ -153,6 +154,8 @@ public class CharPuzGUI extends JFrame
 	private void setDictionary(ActionEvent e) //handle the event to change the dictionary
 	{
 		JFileChooser dictFileChooser = new JFileChooser(".");
+		dictFileChooser.setAcceptAllFileFilterUsed(false);
+		dictFileChooser.addChoosableFileFilter(combinedDictFileFilter);
 		dictFileChooser.addChoosableFileFilter(dictFileFilter);
 		dictFileChooser.addChoosableFileFilter(txtDictFileFilter);
 		dictFileChooser.setMultiSelectionEnabled(false);
