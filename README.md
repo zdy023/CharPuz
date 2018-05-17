@@ -35,4 +35,4 @@ Or you can use `make image` to generate a image so that you can run the programm
 image/bin/CharPuz
 ```
 
-to run this game in an environment without JRE (&lt;=9). 
+to run this game in an environment without JRE (&gt;=9). 
