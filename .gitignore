@@ -5,3 +5,10 @@ opt/*
 *.dict
 *.jar
 image/*
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.JPG
+*.JPEG
+*.desktop

@@ -9,9 +9,14 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.OptionalInt;
+/**
+ * The puzzle generator.
+ * @author David Chang
+ * @version 1.2
+ */
 public class Generator
 {
-	public class StringStatus implements Cloneable//for the status of the string like coordinats, horizontal or vertical and etc.
+	public class StringStatus implements Cloneable //for the status of the string like coordinats, horizontal or vertical and etc.
 	{
 		String string; //字符串
 		int hMax,hMin; //水平坐标范围
@@ -66,17 +71,20 @@ public class Generator
 			return this.horiOrNot;
 		}
 
+		@Override
 		public boolean equals(Object status)
 		{
 			if(!(status instanceof StringStatus))
 				return false;
 			return this.string.equals(((StringStatus)status).string);
 		}
+		@Override
 		public int hashCode()
 		{
 			return this.string.hashCode();
 		}
 		
+		@Override
 		public Object clone()
 		{
 			StringStatus stringStatus = new StringStatus(this.string,this.hMax,this.hMin,this.vMax,this.vMin,this.horiOrNot);

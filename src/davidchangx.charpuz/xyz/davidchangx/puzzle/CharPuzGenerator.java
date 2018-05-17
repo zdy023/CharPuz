@@ -9,6 +9,11 @@ import java.io.PrintStream;
 import xyz.davidchangx.puzzle.CharPuzGUI;
 import java.io.IOException;
 import javax.swing.JOptionPane;
+/**
+ * The main class of this programme.
+ * @author David Chang
+ * @version 1.2
+ */
 public class CharPuzGenerator
 {
 	public static void main(String[] args)

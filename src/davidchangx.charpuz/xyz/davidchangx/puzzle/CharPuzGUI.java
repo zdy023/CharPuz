@@ -44,6 +44,11 @@ import java.awt.Color;
 import javax.swing.JMenuItem;
 import java.awt.Font;
 import java.io.UnsupportedEncodingException;
+/**
+ * The GUI of the programme.
+ * @author David Chang
+ * @version 1.2
+ */
 public class CharPuzGUI extends JFrame
 {
 	private JMenuItem newGameMenuItem,setDictMenuItem;
@@ -66,6 +71,7 @@ public class CharPuzGUI extends JFrame
 
 	private boolean generateNewGameOrNot;
 	private FileFilter dictFileFilter,txtDictFileFilter,combinedDictFileFilter;
+	private File lastDirectory;
 
 	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
@@ -81,6 +87,7 @@ public class CharPuzGUI extends JFrame
 		dictFileFilter = new FileNameExtensionFilter("二进制词典文件","dict");
 		txtDictFileFilter = new FileNameExtensionFilter("词典文本文件","txt");
 		combinedDictFileFilter = new FileNameExtensionFilter("词典文件 *.dict;*.txt","dict","txt");
+		lastDirectory = new File(".");
 
 		JMenuBar menuBar = new JMenuBar();
 		JMenu gameMenu = new JMenu("游戏");
@@ -159,17 +166,19 @@ public class CharPuzGUI extends JFrame
 		dictFileChooser.addChoosableFileFilter(dictFileFilter);
 		dictFileChooser.addChoosableFileFilter(txtDictFileFilter);
 		dictFileChooser.setMultiSelectionEnabled(false);
+		dictFileChooser.setCurrentDirectory(lastDirectory);
 		if(dictFileChooser.showOpenDialog(this)==JFileChooser.APPROVE_OPTION)
 		{
 			try
 			{
 				File dictFile = dictFileChooser.getSelectedFile();
+				lastDirectory = dictFile.getParentFile();
 				String dictFileName = dictFile.getName();
 				TreeMap<Character,TreeMap<String,Integer>> dictionary;
 				if(dictFileName.substring(dictFileName.length()-4).equals(".txt"))
 				{
 					dictionary = parseDictionary(dictFile);
-					writeDictionary(new File(dictFileName.substring(0,dictFileName.length()-4) + ".dict"),dictionary);
+					writeDictionary(new File(dictFile.getParent() + dictFileName.substring(0,dictFileName.length()-4) + ".dict"),dictionary);
 				}
 				else
 					dictionary = readDictionary(dictFile);
@@ -241,6 +250,7 @@ public class CharPuzGUI extends JFrame
 		}
 		return dictionary;
 	}
+	@SuppressWarnings({"unchecked"})
 	public static TreeMap<Character,TreeMap<String,Integer>> readDictionary(File file) throws FileNotFoundException,IOException //a tool method to read a dict in from a binary dict file
 	{
 		try
