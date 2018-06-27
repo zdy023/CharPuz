@@ -77,7 +77,7 @@ public class CharPuzGUI extends JFrame
 
 	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary,String[] charsets)
 	{
-		super("填字游戏");
+		super("CharPuz - by David Chang");
 
 		this.gn = new Generator(dictionary);
 		puzzleX = puzzleY = 18;
@@ -87,18 +87,18 @@ public class CharPuzGUI extends JFrame
 		this.charsets = charsets;
 
 		generateNewGameOrNot = false;
-		dictFileFilter = new FileNameExtensionFilter("二进制词典文件","dict");
-		txtDictFileFilter = new FileNameExtensionFilter("词典文本文件","txt");
-		combinedDictFileFilter = new FileNameExtensionFilter("词典文件 *.dict;*.txt","dict","txt");
+		dictFileFilter = new FileNameExtensionFilter("Binary Dictionary File","dict");
+		txtDictFileFilter = new FileNameExtensionFilter("Plain Text Dictionary","txt");
+		combinedDictFileFilter = new FileNameExtensionFilter("Dictionary File (*.dict;*.txt)","dict","txt");
 		lastDirectory = new File(".");
 
 		JMenuBar menuBar = new JMenuBar();
-		JMenu gameMenu = new JMenu("游戏");
+		JMenu gameMenu = new JMenu("Game");
 		gameMenu.setFont(new Font(null,Font.PLAIN,MF));
-		newGameMenuItem = new JMenuItem("新游戏");
+		newGameMenuItem = new JMenuItem("New Game");
 		newGameMenuItem.setFont(new Font(null,Font.PLAIN,MF));
 		newGameMenuItem.addActionListener(this::configNewGame);
-		setDictMenuItem = new JMenuItem("设置词库");
+		setDictMenuItem = new JMenuItem("Change Dictionary");
 		setDictMenuItem.setFont(new Font(null,Font.PLAIN,MF));
 		setDictMenuItem.addActionListener(this::setDictionary); 
 		gameMenu.add(newGameMenuItem);
@@ -113,9 +113,9 @@ public class CharPuzGUI extends JFrame
 		this.add(gameArea,BorderLayout.CENTER);
 
 		rightSidebarBox = new Box(BoxLayout.Y_AXIS);
-		dictNameLabel = new JLabel("当前词库：Dict(Default)");
+		dictNameLabel = new JLabel("Current Dictionary: Dict(Default)");
 		dictNameLabel.setFont(new Font(null,Font.PLAIN,S));
-		showAnswerButton = new JButton("显示答案");
+		showAnswerButton = new JButton("Show Answer");
 		showAnswerButton.setFont(new Font(null,Font.PLAIN,S));
 		showAnswerButton.addActionListener(this::showAnswer);
 		showAnswerButton.setEnabled(false);
@@ -158,7 +158,8 @@ public class CharPuzGUI extends JFrame
 					return;
 				}
 			}
-			JOptionPane.showMessageDialog(this,"生成失败……您可更换词库或调整区域大小后再次尝试。","生成失败",JOptionPane.INFORMATION_MESSAGE);
+			//JOptionPane.showMessageDialog(this,"生成失败……您可更换词库或调整区域大小后再次尝试。","生成失败",JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this,"Generation failed. You can change a dictionary or adjust the size of puzzle and then retry. ","Generation Fail",JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	private void setDictionary(ActionEvent e) //handle the event to change the dictionary
@@ -186,18 +187,20 @@ public class CharPuzGUI extends JFrame
 				else
 					dictionary = readDictionary(dictFile);
 				gn.setDictionary(dictionary);
-				dictNameLabel.setText("当前词库：" + dictFileName.substring(0,dictFileName.lastIndexOf((int)'.')));
-				JOptionPane.showMessageDialog(this,"词库更新完成！","提示",JOptionPane.INFORMATION_MESSAGE);
+				dictNameLabel.setText("Current Dictionary: " + dictFileName.substring(0,dictFileName.lastIndexOf((int)'.')));
+				JOptionPane.showMessageDialog(this,"Dictionary Update Finished! ","Notification",JOptionPane.INFORMATION_MESSAGE);
 			}
 			catch(FileNotFoundException fnfe)
 			{
 				System.out.println(fnfe);
-				JOptionPane.showMessageDialog(this,"词典打开失败，请检查您的词典文件，确认它存在并符合编码与格式要求","打开失败",JOptionPane.ERROR_MESSAGE);
+				//JOptionPane.showMessageDialog(this,"词典打开失败，请检查您的词典文件，确认它存在并符合编码与格式要求","打开失败",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this,"Dictionary opening failed. Please check your dictionary file's existing and ensure its encoding and format is correct.  ","Opening Fail",JOptionPane.ERROR_MESSAGE);
 			}
 			catch(IOException ie)
 			{
 				System.out.println(ie);
-				JOptionPane.showMessageDialog(this,"读写错误！","读写错误！",JOptionPane.ERROR_MESSAGE);
+				//JOptionPane.showMessageDialog(this,"读写错误！","读写错误！",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(this,"I/O error! ","I/O Error! ",JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
@@ -238,7 +241,7 @@ public class CharPuzGUI extends JFrame
 					break;
 			}
 			if(i==3)
-				throw new UnsupportedEncodingException("The scanner can scan the dict file as neither utf-8, gbk or utf-16,  please ensure that your dict file is encoded in one of them. ");
+				throw new UnsupportedEncodingException("The scanner can scan the dict file as neither encoding configured in config file,  please ensure that your dict file is encoded in the correct encoding. ");
 		}
 		for(;s.hasNext();)
 		{
@@ -370,7 +373,7 @@ public class CharPuzGUI extends JFrame
 
 		NewGameDialog()
 		{
-			super(CharPuzGUI.this,"新游戏",true);
+			super(CharPuzGUI.this,"New Game",true);
 			this.setSize(W,H);
 			this.setLocation((CharPuzGUI.this.getWidth()>>1)-(W>>1),(CharPuzGUI.this.getHeight()>>1)-(H>>1));
 			this.setLayout(new BorderLayout());
@@ -380,13 +383,13 @@ public class CharPuzGUI extends JFrame
 			ratingEditorSplitPane.setDividerLocation(.3);
 
 			inputLabelBox = new Box(BoxLayout.Y_AXIS);
-			xSizeLabel = new JLabel("宽度");
+			xSizeLabel = new JLabel("Width");
 			xSizeLabel.setSize(LL,HI);
 			xSizeLabel.setFont(new Font(null,Font.PLAIN,LF));
-			ySizeLabel = new JLabel("高度");
+			ySizeLabel = new JLabel("Height");
 			ySizeLabel.setSize(LL,HI);
 			ySizeLabel.setFont(new Font(null,Font.PLAIN,LF));
-			difficultyLabel = new JLabel("难易");
+			difficultyLabel = new JLabel("Difficulty");
 			difficultyLabel.setSize(LL,HI);
 			difficultyLabel.setFont(new Font(null,Font.PLAIN,LF));
 			inputLabelBox.add(xSizeLabel);
@@ -410,12 +413,12 @@ public class CharPuzGUI extends JFrame
 
 			dialogButtonsArea = new JPanel();
 			dialogButtonsArea.setLayout(new FlowLayout(FlowLayout.CENTER));
-			cancelButton = new JButton("取消");
+			cancelButton = new JButton("Cancle");
 			cancelButton.addActionListener((ActionEvent e)->{
 				NewGameDialog.this.dispose();
 				generateNewGameOrNot = false;
 			});
-			confirmButton = new JButton("确认");
+			confirmButton = new JButton("Ensure");
 			confirmButton.addActionListener(this::setNewGameConfig);
 			dialogButtonsArea.add(cancelButton);
 			dialogButtonsArea.add(confirmButton);

@@ -40,7 +40,8 @@ public class CharPuzGenerator
 			else
 			{
 				System.out.println("The default dict file does not exist, you should set the dict file first after you enter the application! ");
-				JOptionPane.showMessageDialog(null,"默认的词典文件不存在，请再进入程序后首先设置您自己的词典文件。","词典文件不存在",JOptionPane.WARNING_MESSAGE);
+				//JOptionPane.showMessageDialog(null,"默认的词典文件不存在，请在进入程序后首先设置您自己的词典文件。","词典文件不存在",JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(null,"The default dictionary file does not exist, please set your own dictionary first after enterring programme. ","Dictionary file does not exist. ",JOptionPane.WARNING_MESSAGE);
 				dict = null;
 			}
 			CharPuzGUI gui = new CharPuzGUI(dict,altEncodings);
@@ -48,7 +49,8 @@ public class CharPuzGenerator
 		catch(FileNotFoundException e)
 		{
 			System.out.println(e);
-			System.out.println("请确认默认词库文件Dict.txt或Dict.dict存在，再重新启动程序。");
+			//System.out.println("请确认默认词库文件Dict.txt或Dict.dict存在，再重新启动程序。");
+			System.out.println("Please ensure the existing of Dict.txt or Dict.dict and restart the programme. ");
 			System.exit(0);
 		}
 		catch(IOException e)

@@ -2,9 +2,11 @@
 
 This is a little programme of word puzzle game. There are several words horizontally or vertically placed in the rectangle area, and there are several blanks inside the words. The target of the game is to fill the correct missing character or letter in the blank so as to complete the puzzle. 
 
-I use a map data structure like &lt;character(char),&lt;word(String),position_of_the_character_in_word(int)&gt;&gt; as the dictionay and use dfs to search in the status space until the first complete puzzle is found. 
+I use a map data structure like `<character(char),<word(String),position_of_the_character_in_word(int)>>` as the dictionary and use dfs to search in the status space until the first complete puzzle is found. 
 
 ## Have a Try
+
+### Build the Programme
 
 You can clone this repository and compile it and have a try with this word puzzle game. 
 
@@ -36,3 +38,22 @@ image/bin/CharPuz
 ```
 
 to run this game in an environment without JRE (&gt;=9). 
+
+### Build the Dictionary
+
+To generate a game, you need a proper dictionary. This programme support dictionary form as plain text (.txt) and binary data (.dict). 
+
+The plain text dictionary is surposed to be in form: 
+
+```
+worda
+wordb
+wordc
+...
+```
+
+In each inline, there is a word without space or other whitespace character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. 
+
+The binary dictionary is in form of serialization of dictionary `<Character,<String,int>>` and will be generated automatically if you choose a txt dictionary for the programme. 
+
+By the way, the programme's running requires a default dictionary named `Dict.dict` or `Dict.txt` under the runtime path, so you can rename your own dictionary as `Dict.txt` to load it while launching programme. And it's sure you can change dictionary in runtime. 
