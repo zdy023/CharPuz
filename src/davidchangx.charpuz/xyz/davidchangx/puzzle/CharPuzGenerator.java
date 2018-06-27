@@ -9,6 +9,9 @@ import java.io.PrintStream;
 import xyz.davidchangx.puzzle.CharPuzGUI;
 import java.io.IOException;
 import javax.swing.JOptionPane;
+import java.util.Properties;
+import java.io.FileReader;
+import java.io.BufferedReader;
 /**
  * The main class of this programme.
  * @author David Chang
@@ -20,6 +23,10 @@ public class CharPuzGenerator
 	{
 		try
 		{
+			Properties properties = new Properties();
+			properties.load(new BufferedReader(new FileReader("config")));
+			String encodingProperty = properties.getProperty("encoding","utf-8, gbk, utf-16");
+			String[] altEncodings = encodingProperty.split("\\ *,\\ *");
 			TreeMap<Character,TreeMap<String,Integer>> dict;
 			File binaryDictFile = new File("Dict.dict");
 			File txtDictFile = new File("Dict.txt");
@@ -27,7 +34,7 @@ public class CharPuzGenerator
 				dict = CharPuzGUI.readDictionary(binaryDictFile);
 			else if(txtDictFile.exists())
 			{
-				dict = CharPuzGUI.parseDictionary(txtDictFile);
+				dict = CharPuzGUI.parseDictionary(txtDictFile,altEncodings);
 				CharPuzGUI.writeDictionary(binaryDictFile,dict);
 			}
 			else
@@ -36,7 +43,7 @@ public class CharPuzGenerator
 				JOptionPane.showMessageDialog(null,"默认的词典文件不存在，请再进入程序后首先设置您自己的词典文件。","词典文件不存在",JOptionPane.WARNING_MESSAGE);
 				dict = null;
 			}
-			CharPuzGUI gui = new CharPuzGUI(dict);
+			CharPuzGUI gui = new CharPuzGUI(dict,altEncodings);
 		}
 		catch(FileNotFoundException e)
 		{

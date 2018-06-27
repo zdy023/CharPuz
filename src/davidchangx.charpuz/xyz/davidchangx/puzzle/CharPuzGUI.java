@@ -59,7 +59,7 @@ public class CharPuzGUI extends JFrame
 	private JLabel dictNameLabel;
 	private JButton showAnswerButton;
 
-	private final static int X = 40; //the lenth of a character grid
+	private final static int X = 40; //the length of a character grid
 	private final static int S = 20; //the font size of the text on the face panel
 	private final static int MF = 18; //the font size of the text on menu bar
 	private final static int FS = 30; //the font size of the text in puzzle
@@ -73,7 +73,9 @@ public class CharPuzGUI extends JFrame
 	private FileFilter dictFileFilter,txtDictFileFilter,combinedDictFileFilter;
 	private File lastDirectory;
 
-	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary)
+	private String[] charsets;
+
+	public CharPuzGUI(TreeMap<Character,TreeMap<String,Integer>> dictionary,String[] charsets)
 	{
 		super("填字游戏");
 
@@ -82,6 +84,7 @@ public class CharPuzGUI extends JFrame
 		blankPercentage = 0;
 		this.setSize(X*puzzleX+L,X*puzzleY+H);
 
+		this.charsets = charsets;
 
 		generateNewGameOrNot = false;
 		dictFileFilter = new FileNameExtensionFilter("二进制词典文件","dict");
@@ -177,7 +180,7 @@ public class CharPuzGUI extends JFrame
 				TreeMap<Character,TreeMap<String,Integer>> dictionary;
 				if(dictFileName.substring(dictFileName.length()-4).equals(".txt"))
 				{
-					dictionary = parseDictionary(dictFile);
+					dictionary = parseDictionary(dictFile,this.charsets);
 					writeDictionary(new File(dictFile.getParent() + dictFileName.substring(0,dictFileName.length()-4) + ".dict"),dictionary);
 				}
 				else
@@ -221,14 +224,14 @@ public class CharPuzGUI extends JFrame
 		}
 		return dictionary;
 	}
-	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file) throws FileNotFoundException,UnsupportedEncodingException //a tool method to parse a text dict file to a runtime dict
+	public static TreeMap<Character,TreeMap<String,Integer>> parseDictionary(File file,String[] charsets) throws FileNotFoundException,UnsupportedEncodingException //a tool method to parse a text dict file to a runtime dict
 	{
 		TreeMap<Character,TreeMap<String,Integer>> dictionary = new TreeMap<>();
-		String[] charsets = {"utf-8","gbk","utf-16"};
+		//String[] charsets = {"utf-8","gbk","utf-16"};
 		Scanner s = null;
 		{
 			int i;
-			for(i = 0;i<3;i++)
+			for(i = 0;i<charsets.length;i++)
 			{
 				s = new Scanner(file,charsets[i]);
 				if(s.hasNext())
