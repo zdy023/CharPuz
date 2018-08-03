@@ -11,12 +11,21 @@ import java.util.Random;
 import java.util.OptionalInt;
 /**
  * The puzzle generator.
+ *
+ * This puzzle generator uses dictionary in form like {@code TreeMap<Character,TreeMap<String,Integer>>}. The {@code Character} is needed as possible common character of several strings. The {@String} is considered as the string. The {@code Integer} is the position of the character in this string. So this structure means, a specific charater is in a string, and it is on the position of index {@Integer}. 
+ *
  * @author David Chang
  * @version 1.2
  */
 public class Generator
 {
-	public class StringStatus implements Cloneable //for the status of the string like coordinats, horizontal or vertical and etc.
+	/**
+	 * Stores the status of a string like horizontal or vertical coordinates and etc during dfs. 
+	 *
+	 * @author David Chang
+	 * @version 1.2
+	 */
+	public class StringStatus implements Cloneable //for the status of the string like horizontal or vertical coordinates and etc.
 	{
 		String string; //字符串
 		int hMax,hMin; //水平坐标范围
@@ -25,6 +34,16 @@ public class Generator
 		OptionalInt connectedIndex; //已经连接过的字的节点
 
 		
+		/**
+		 * Constructs a {@code StringStatus} object. 
+		 *
+		 * @param string the string
+		 * @param hMax the horizontal coordinate of the last character
+		 * @param hMin the horizontal coordinate of the first character
+		 * @param vMax the horizontal coordinate of the last character
+		 * @param vMin the horizontal coordinate of the first character
+		 * @param horiOrNot if this string is placed horizontally or vertically
+		 */
 		StringStatus(String string,int hMax,int hMin,int vMax,int vMin,boolean horiOrNot)
 		{
 			this.string = string;
@@ -35,6 +54,17 @@ public class Generator
 			this.horiOrNot = horiOrNot;
 			this.connectedIndex = OptionalInt.empty();
 		}
+		/**
+		 * Constructs a {@code StringStatus} object. 
+		 *
+		 * @param string the string
+		 * @param hMax the horizontal coordinate of the last character
+		 * @param hMin the horizontal coordinate of the first character
+		 * @param vMax the horizontal coordinate of the last character
+		 * @param vMin the horizontal coordinate of the first character
+		 * @param horiOrNot if this string is placed horizontally or vertically
+		 * @param connectedIndex the index of the common character with previous string
+		 */
 		StringStatus(String string,int hMax,int hMin,int vMax,int vMin,boolean horiOrNot,int connectedIndex)
 		{
 			this.string = string;
@@ -46,31 +76,68 @@ public class Generator
 			this.connectedIndex = OptionalInt.of(connectedIndex);
 		}
 
+		/**
+		 * Get the string. 
+		 *
+		 * @return the string
+		 */
 		public String getString()
 		{
 			return this.string;
 		}
+		/**
+		 * Get the horizontal coordinate of the first character. 
+		 *
+		 * @return the horizontal coordinate of the first character
+		 */
 		public int getLeft()
 		{
 			return this.hMin;
 		}
+		/**
+		 * Get the horizontal coordinate of the last character. 
+		 *
+		 * @return the horizontal coordinate of the last character
+		 */
 		public int getRight()
 		{
 			return this.hMax;
 		}
+		/**
+		 * Get the vertical coordinate of the first character. 
+		 *
+		 * @return the vertical coordinate of the first character
+		 */
 		public int getTop()
 		{
 			return this.vMin;
 		}
+		/**
+		 * Get the vertical coordinate of the last character. 
+		 *
+		 * @return the vertical coordinate of the last character
+		 */
 		public int getBottom()
 		{
 			return this.vMax;
 		}
+		/**
+		 * Check if this string is placed horizontally. 
+		 *
+		 * @return if this string is placed horizontally
+		 */
 		public boolean isHorizontal()
 		{
 			return this.horiOrNot;
 		}
 
+		/**
+		 * Compares this object with another object. 
+		 *
+		 * We simply considered two {@code StringStatus} objects equal when the strings of these two objects equal, but don't consider the other properties. 
+		 *
+		 * @return if this object equals another object
+		 */
 		@Override
 		public boolean equals(Object status)
 		{
@@ -78,12 +145,24 @@ public class Generator
 				return false;
 			return this.string.equals(((StringStatus)status).string);
 		}
+		/**
+		 * Get the hash code of this object. 
+		 *
+		 * We simply use the hash code of the string as the hash code of the {@code StringStatus} object. 
+		 *
+		 * @return the hash code of the {@code StringStatus} object
+		 */
 		@Override
 		public int hashCode()
 		{
 			return this.string.hashCode();
 		}
 		
+		/**
+		 * Returns a clone of this object. 
+		 *
+		 * @return a clone of this object
+		 */
 		@Override
 		public Object clone()
 		{
@@ -100,6 +179,11 @@ public class Generator
 	private char[][] map; //the map to save the full puzzle
 	private int width,height; //the width and the height of the logical target-map
 
+	/**
+	 * Constructs a puzzle generator with given dictionary. 
+	 * 
+	 * @param dictionary the dictionary in need
+	 */
 	public Generator(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
 		this.dictionary = dictionary;
@@ -111,6 +195,14 @@ public class Generator
 		this.map = null;
 	}
 
+	/**
+	 * Set the size of the target puzzle and clear the previous result remained. 
+	 *
+	 * Our puzzle generation method won't clear the generation result (so that the invoker can get the result for times after generation). So it's necessary for the invoker to invoke this method first to guarantee that the result of the last generation should be cleared when he wants to generate a new puzzle using {@link generate()}, or unpredictable result may occur. 
+	 *
+	 * @param width the width of target puzzle
+	 * @param height the height of target puzzle
+	 */
 	public void setSize(int width,int height) //set the size of target puzzle and clear the previous result, whenever the invoker wants to generate a new puzzle by invoking generate(), he should invoke this method first to guarantee that the result of the last generation should be cleared or it might cause unpredictable wrong generation result
 	{
 		this.width = width;
@@ -122,6 +214,15 @@ public class Generator
 		}
 		addedStrings.clear();
 	}
+	/**
+	 * Change the dictionary used for generation. 
+	 *
+	 * {@code Generator} never create a copy of the dictionary, it simply get the reference of the dictionary object and use it. 
+	 *
+	 * About the dictionary's structure, please refer to {@link Generator}. 
+	 *
+	 * @param dictionary the new dictionary
+	 */
 	public void setDictionary(TreeMap<Character,TreeMap<String,Integer>> dictionary)
 	{
 		this.dictionary = dictionary;
@@ -305,10 +406,20 @@ public class Generator
 		}
 		return false;
 	}
+	/**
+	 * Generates a puzzle. 
+	 *
+	 * @return if the generation succeeds
+	 */
 	public boolean generate() //the interface for the other applications to invoke to generate a puzzle
 	{
 		return this.succeededOrNot = this.generate(-1,0,-1,0,1);
 	}
+	/**
+	 * Get the puzzle in form of {@code char[][]} or null if last generation has failed. 
+	 *
+	 * @return the puzzle in form of {@code char[][]} or null if last generation has failed
+	 */
 	public char[][] getMap()
 	{
 		if(this.succeededOrNot)
@@ -323,6 +434,15 @@ public class Generator
 		else
 			return null;
 	}
+	/**
+	 * Returns the puzzle in form of list of {@link StringStatus}. 
+	 *
+	 * If the last generation has failed, the returned list will be empty. 
+	 *
+	 * If the list is not empty, the invoker may use the list of {@link StringStatus} to generate a proper form of puzzle by itself. 
+	 *
+	 * @return the list of {@link StringStatus}
+	 */
 	public StringStatus[] getIdiomList()
 	{
 		return addedStrings.stream().map((StringStatus x)->{

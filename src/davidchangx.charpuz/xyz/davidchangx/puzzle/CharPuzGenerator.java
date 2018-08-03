@@ -14,11 +14,15 @@ import java.io.FileReader;
 import java.io.BufferedReader;
 /**
  * The main class of this programme.
+ *
  * @author David Chang
  * @version 1.2
  */
 public class CharPuzGenerator
 {
+	/**
+	 * The main programme of the CharPuz game. 
+	 */
 	public static void main(String[] args)
 	{
 		try

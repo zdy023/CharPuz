@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"CharPuzGenerator","h":"","u":""},{"l":"CharPuzGUI","h":"","u":""},{"l":"Generator","h":"","u":""},{"l":"Generator.StringStatus","h":"","u":""}]

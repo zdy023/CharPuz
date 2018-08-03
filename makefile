@@ -16,7 +16,7 @@ $(opt)/CharPuzGenerator.class: $(opt)/Generator.class $(opt)/CharPuzGUI.class
 $(opt)/%.class: $(src)/%.java
 	$(javac) $<
 
-.PHONY: clean image jar
+.PHONY: clean image jar docs
 image: all
 	jlink -p opt --add-modules davidchangx.charpuz --launcher CharPuz=davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator --output image
 .ONESHELL: jar
@@ -27,3 +27,6 @@ jar: all
 clean:
 	- rm -rf opt/
 	- rm -rf image/
+	- rm -rf docs/
+docs:
+	javadoc --module davidchangx.charpuz --module-source-path src -p opt -d docs -html5 -version -author

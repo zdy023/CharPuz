@@ -52,7 +52,7 @@ wordc
 ...
 ```
 
-In each inline, there is a word without space or other whitespace character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. 
+In each line, there is a word without space or other whitespace character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. 
 
 The binary dictionary is in form of serialization of dictionary `<Character,<String,int>>` and will be generated automatically if you choose a txt dictionary for the programme. 
 
