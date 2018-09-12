@@ -16,7 +16,7 @@ import java.io.BufferedReader;
  * The main class of this programme.
  *
  * @author David Chang
- * @version 1.2
+ * @version 1.3
  */
 public class CharPuzGenerator
 {
@@ -31,9 +31,11 @@ public class CharPuzGenerator
 			properties.load(new BufferedReader(new FileReader("config")));
 			String encodingProperty = properties.getProperty("encoding","utf-8, gbk, utf-16");
 			String[] altEncodings = encodingProperty.split("\\ *,\\ *");
+
+			String initDir = properties.getProperty("dict_path",".");
 			TreeMap<Character,TreeMap<String,Integer>> dict;
-			File binaryDictFile = new File("Dict.dict");
-			File txtDictFile = new File("Dict.txt");
+			File binaryDictFile = new File(initDir,"Dict.dict");
+			File txtDictFile = new File(initDir,"Dict.txt");
 			if(binaryDictFile.exists())
 				dict = CharPuzGUI.readDictionary(binaryDictFile);
 			else if(txtDictFile.exists())
@@ -49,6 +51,7 @@ public class CharPuzGenerator
 				dict = null;
 			}
 			CharPuzGUI gui = new CharPuzGUI(dict,altEncodings);
+			gui.initDictDirectory(new File(initDir));
 		}
 		catch(FileNotFoundException e)
 		{

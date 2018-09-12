@@ -12,3 +12,6 @@ image/*
 *.JPG
 *.JPEG
 *.desktop
+GTAGS
+GRTAGS
+GPATH

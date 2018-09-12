@@ -23,7 +23,7 @@ java -p opt -m davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator
 
 after compilation to launch the programme. 
 
-Also you can use `make jar` to generate a `jar` archieve and use
+Also you can use `make jar` to generate a `jar` archive and use
 
 ```
 java -jar davidchangx.charpuz.jar
@@ -37,13 +37,13 @@ Or you can use `make image` to generate a image so that you can run the programm
 image/bin/CharPuz
 ```
 
-to run this game in an environment without JRE (&gt;=9). 
+to run this game in an environment without JRE. 
 
 ### Build the Dictionary
 
 To generate a game, you need a proper dictionary. This programme support dictionary form as plain text (.txt) and binary data (.dict). 
 
-The plain text dictionary is surposed to be in form: 
+The plain text dictionary is supposed to be in form: 
 
 ```
 worda
@@ -52,8 +52,8 @@ wordc
 ...
 ```
 
-In each line, there is a word without space or other whitespace character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. 
+In each line, there is a word without space or other white space character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. 
 
 The binary dictionary is in form of serialization of dictionary `<Character,<String,int>>` and will be generated automatically if you choose a txt dictionary for the programme. 
 
-By the way, the programme's running requires a default dictionary named `Dict.dict` or `Dict.txt` under the runtime path, so you can rename your own dictionary as `Dict.txt` to load it while launching programme. And it's sure you can change dictionary in runtime. 
+By the way, the programme's running requires a default dictionary named `Dict.dict` or `Dict.txt` under the runtime path or the "path" property set in config file, so you can rename your own dictionary as `Dict.txt` to load it while launching programme. And it's sure you can change dictionary in runtime. 

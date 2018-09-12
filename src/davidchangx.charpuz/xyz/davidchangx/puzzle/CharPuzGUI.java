@@ -48,7 +48,7 @@ import java.io.UnsupportedEncodingException;
  * The GUI of the programme.
  *
  * @author David Chang
- * @version 1.2
+ 2 @version 1.3
  */
 public class CharPuzGUI extends JFrame
 {
@@ -139,6 +139,16 @@ public class CharPuzGUI extends JFrame
 			}
 		});
 		this.setVisible(true);
+	}
+	/**
+	 * Set an initial directory to find dict files. If not set, the path of the current path will be used. 
+	 *
+	 * @param initDirectory the initial directory to find dict files
+	 * @since 1.3
+	 */
+	public void initDictDirectory(File initDirectory)
+	{
+		this.lastDirectory = initDirectory;
 	}
 
 	/**
