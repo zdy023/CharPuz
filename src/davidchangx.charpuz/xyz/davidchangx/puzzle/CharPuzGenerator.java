@@ -31,7 +31,7 @@ public class CharPuzGenerator
 			if(args.length>=1)
 				configFileName = args[0];
 			else
-				configFileName = "~/.charpuz_config";
+				configFileName = "/home/.charpuz_config";
 			Properties properties = new Properties();
 			File configFile = new File(configFileName);
 			if(configFile.exists())
