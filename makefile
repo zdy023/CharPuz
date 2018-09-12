@@ -12,16 +12,17 @@ target = Generator CharPuzGenerator CharPuzGUI
 all: $(addsuffix .class,$(addprefix $(opt)/,$(target)))
 exe: $(opt)/CharPuzGenerator.class
 test: $(addsuffix .class,$(addprefix $(opt)/,$(target)))
-	$(java)  davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator
+	$(java)  davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator config
 
 $(opt)/CharPuzGenerator.class: $(opt)/Generator.class $(opt)/CharPuzGUI.class
 
 $(opt)/%.class: $(src)/%.java
 	$(javac) $<
 
-.PHONY: clean image jar docs
+.PHONY: clean image jar docs tar
 image: all
 	jlink -p opt --add-modules davidchangx.charpuz --launcher CharPuz=davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator --output image
+
 .ONESHELL: jar
 jar: all
 	cd opt/davidchangx.charpuz
@@ -33,3 +34,6 @@ clean:
 	- rm -rf docs/
 docs:
 	javadoc --module davidchangx.charpuz --module-source-path src -p opt -d docs -html5 -version -author
+
+tar: image
+	tar -xzvf CharPuz.tar.gz image/

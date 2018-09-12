@@ -27,8 +27,15 @@ public class CharPuzGenerator
 	{
 		try
 		{
+			String configFileName;
+			if(args.length>=1)
+				configFileName = args[0];
+			else
+				configFileName = "~/.charpuz_config";
 			Properties properties = new Properties();
-			properties.load(new BufferedReader(new FileReader("config")));
+			File configFile = new File(configFileName);
+			if(configFile.exists())
+				properties.load(new BufferedReader(new FileReader("config")));
 			String encodingProperty = properties.getProperty("encoding","utf-8, gbk, utf-16");
 			String[] altEncodings = encodingProperty.split("\\ *,\\ *");
 
