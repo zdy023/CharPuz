@@ -52,7 +52,7 @@ wordc
 ...
 ```
 
-In each line, there is a word without space or other white space character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file `~/.charpuz_config` to make the programme support more kinds of encodings. 
+In each line, there is a word without space or other white space character in it. By default, the programme support encoding: UTF-8, GBK and UTF-16. But you can modify the `encoding` property in config file to make the programme support more kinds of encodings. The default config file is `~/.charpuz_config`, and you can specify the config file by commang argument.
 
 The binary dictionary is in form of serialization of dictionary `<Character,<String,int>>` and will be generated automatically if you choose a txt dictionary for the programme. 
 
