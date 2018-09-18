@@ -35,7 +35,7 @@ public class CharPuzGenerator
 			Properties properties = new Properties();
 			File configFile = new File(configFileName);
 			if(configFile.exists())
-				properties.load(new BufferedReader(new FileReader("config")));
+				properties.load(new BufferedReader(new FileReader(configFile)));
 			String encodingProperty = properties.getProperty("encoding","utf-8, gbk, utf-16");
 			String[] altEncodings = encodingProperty.split("\\ *,\\ *");
 
