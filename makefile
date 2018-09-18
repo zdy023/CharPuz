@@ -20,11 +20,11 @@ $(opt)/%.class: $(src)/%.java
 	$(javac) $<
 
 .PHONY: clean image jar docs tar install
+.ONESHELL: jar image tar
 image: all
 	- rm -rf image/
 	jlink -p opt --add-modules davidchangx.charpuz --launcher CharPuz=davidchangx.charpuz/xyz.davidchangx.puzzle.CharPuzGenerator --output image
 
-.ONESHELL: jar
 jar: all
 	cd opt/davidchangx.charpuz
 	jar --create --file=davidchangx.charpuz.jar --module-version=$(version) --main-class xyz.davidchangx.puzzle.CharPuzGenerator .
@@ -33,8 +33,11 @@ clean:
 	- rm -rf opt/
 	- rm -rf image/
 	- rm -rf docs/
+	- rm -rf davidchangx.charpuz.jar
+	- rm -rf CharPuz.tar.gz
 docs:
 	javadoc --module davidchangx.charpuz --module-source-path src -p opt -d docs -html5 -version -author
 
 tar: image
-	tar -xzvf CharPuz.tar.gz image/
+	- rm -rf CharPuz.tar.gz
+	tar -czvf CharPuz.tar.gz image/
