@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-version=1.3
+version=1.3.1
 
 src = src/davidchangx.charpuz/xyz/davidchangx/puzzle
 opt = opt/davidchangx.charpuz/xyz/davidchangx/puzzle
